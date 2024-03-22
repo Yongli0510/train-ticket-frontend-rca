@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-config
+  namespace: kube-system
+  labels:
+    kubernetes.io/cluster-service: "true"
+    addonmanager.kubernetes.io/mode: EnsureExists
+
+data:
+  alertmanager.yml: |
+    templates:
+    - '/etc/alertmanager/templates/*.tmpl'
+    global:
+      resolve_timeout: 5m
+      smtp_smarthost: "smtp.qq.com:465"
+      smtp_from: "1415193349@qq.com"
+      smtp_auth_username: "1415193349@qq.com"
+      smtp_auth_password: "dypkdxvuqsycgjad"
+      smtp_require_tls: false
+    receivers:
+    - name: email
+      email_configs:
+      - to: "21212010037@m.fudan.edu.cn"
+        send_resolved: true
+        html: '{{ template "email.to.html" . }}'
+    - name: alertsnitch
+      webhook_configs:
+      - url: "http://alertsnitch:9567/webhook"
+        send_resolved: true
+    - name: wechat
+      wechat_configs:
+      - corp_id: ww6275da626740750a # 企业ID
+        to_user: '@all'             # 发送所有人
+        agent_id: 1000002           # agentID
+        api_secret: 7FC8MmL-nUmJ13ntjz9kHuN6oKJpBsWgCZHKHYMvm_Y # secret
+
+    route:
+      group_by: ['alertname']  # 报警分组
+      group_interval: 5m # 如果组内内容不变化，合并为一条警报信息，5m后发送。
+      group_wait: 30s # 在组内等待所配置的时间，如果同组内，30秒内出现相同报警，在一个组内出现。
+      repeat_interval: 5m # 发送报警间隔，如果指定时间内没有修复，则重新发送报警。
+      receiver: wechat
+      routes:
+      - receiver: wechat
+        continue: true      
+      - receiver: email
+        continue: true
+      - receiver: alertsnitch
+        continue: true

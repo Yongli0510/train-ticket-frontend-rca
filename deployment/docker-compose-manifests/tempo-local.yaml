@@ -1,0 +1,41 @@
+search_enabled: true
+
+server:
+  http_listen_port: 3200
+
+distributor:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+        http:
+          endpoint: "0.0.0.0:4200"
+          cors:
+            allowed_origins:
+              - '*' 
+
+ingester:
+  trace_idle_period: 120s
+
+storage:
+  trace:
+    backend: local
+    wal:
+      path: /tmp/tempo/wal
+      encoding: snappy
+    local:
+      path: /tmp/tempo/blocks
+    pool:
+      max_workers: 100
+      queue_depth: 10000
+
+querier:
+  max_concurrent_queries: 12
+query_frontend:
+  max_outstanding_per_tenant: 2048
+  search:
+    concurrent_jobs: 100
+
+compactor:
+  compaction:
+    block_retention: 2880h

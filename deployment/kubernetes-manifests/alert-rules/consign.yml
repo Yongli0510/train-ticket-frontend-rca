@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-rules
+  namespace: kube-system
+data:
+  consign.rules: |
+    groups:
+    - name: ts-consign-service相关接口QPS下降
+      rules:
+      - alert: updateConsign接口QPS下降
+        expr: sum(rate(ts_consign_updateConsign_seconds_count[5m])) == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          description: "实例{{ $labels.instance }}上的服务{{ $labels.service }}的updateConsign接口QPS跌0"
+      - alert: findByOrderId接口QPS下降
+        expr: sum(rate(ts_consign_findByOrderId_seconds_count[5m])) == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          description: "实例{{ $labels.instance }}上的服务{{ $labels.service }}的findByOrderId接口QPS跌0"

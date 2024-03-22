@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-rules
+  namespace: kube-system
+data:
+  preserve.rules: |
+    groups:
+    - name: 订票成功量下降告警
+      rules:
+      - alert: 订票成功量下降告警
+        expr: sum(rate(ts_preserve_preserve_seconds_count[5m])) < 0.5
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: 5分钟内订票成功量增长率低于0.5，当前值：{{ $value }}

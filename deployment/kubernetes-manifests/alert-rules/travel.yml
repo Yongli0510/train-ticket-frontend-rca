@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-rules
+  namespace: kube-system
+data:
+  travel.rules: |
+    groups:
+    - name: ts-travel-service相关接口QPS下降
+      rules:
+      - alert: queryInfo接口QPS下降
+        expr: sum(rate(ts_travel_queryInfo_seconds_count[5m])) == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          description: "实例{{ $labels.instance }}上的服务{{ $labels.service }}的queryInfo接口QPS跌0"

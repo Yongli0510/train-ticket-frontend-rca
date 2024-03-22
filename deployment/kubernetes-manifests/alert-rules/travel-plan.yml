@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-rules
+  namespace: kube-system
+data:
+  travelPlan.rules: |
+    groups:
+    - name: ts-travel-plan-service相关接口QPS下降
+      rules:
+      - alert: getByCheapest接口QPS下降
+        expr: sum(rate(ts_travel_plan_getByQuickest_seconds_count[5m])) == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          description: "实例{{ $labels.instance }}上的服务{{ $labels.service }}的getByCheapest接口QPS跌0"
+      - alert: getByQuickest接口QPS下降
+        expr: sum(rate(ts_travel_plan_getByQuickest_seconds_count[5m])) == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          description: "实例{{ $labels.instance }}上的服务{{ $labels.service }}的getByQuickest接口QPS跌0"
+      - alert: getByMinStation接口QPS下降
+        expr: sum(rate(ts_travel_plan_getByMinStation_seconds_count[5m])) == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          description: "实例{{ $labels.instance }}上的服务{{ $labels.service }}的getByMinStation接口QPS跌0"
